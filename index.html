@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blaue Grotte – Pizza Bestellung</title>
+<style>
+  :root {
+    --bg: #f6f6f6;
+    --accent: #0078ff;
+    --card-bg: #fff;
+    --radius: 1rem;
+  }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    margin: 0;
+    padding: 1rem;
+    color: #222;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+  }
+  form {
+    max-width: 480px;
+    margin: auto;
+    background: var(--card-bg);
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  }
+  .topping-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: .4rem .8rem;
+    margin-bottom: 1rem;
+  }
+  label {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    background: #f9f9f9;
+    border-radius: .5rem;
+    padding: .4rem .6rem;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  input[type="checkbox"] {
+    width: 1.2em;
+    height: 1.2em;
+    accent-color: var(--accent);
+  }
+  input[name="name"] {
+    width: 100%;
+    padding: .6rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: .5rem;
+    box-sizing: border-box;
+  }
+  button {
+    margin-top: 1rem;
+    width: 100%;
+    padding: .8rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: .6rem;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+  }
+  button:active {
+    background: #005fcc;
+  }
+  .success {
+    display: none;
+    text-align: center;
+    color: green;
+    margin-top: .8rem;
+    font-weight: 600;
+  }
+  @media (max-width: 480px) {
+    h1 { font-size: 1.3rem; }
+    form { padding: 1rem; }
+    label { font-size: .95rem; }
+  }
+</style>
+</head>
+<body>
+<h1>Blaue Grotte – Pizza</h1>
+<form id="orderForm">
+  <p><strong>Beläge auswählen:</strong></p>
+  <div class="topping-grid">
+    <label><input type="checkbox" name="toppings" value="Knoblauch">Knoblauch</label>
+    <label><input type="checkbox" name="toppings" value="Schinken">Schinken</label>
+    <label><input type="checkbox" name="toppings" value="Salami">Salami</label>
+    <label><input type="checkbox" name="toppings" value="Zucchini">Zucchini</label>
+    <label><input type="checkbox" name="toppings" value="Hackfleisch">Hackfleisch</label>
+    <label><input type="checkbox" name="toppings" value="Champignons">Champignons</label>
+    <label><input type="checkbox" name="toppings" value="scharfe Peperoni">scharfe Peperoni</label>
+    <label><input type="checkbox" name="toppings" value="Paprika">Paprika</label>
+    <label><input type="checkbox" name="toppings" value="Thunfisch">Thunfisch</label>
+    <label><input type="checkbox" name="toppings" value="frische Tomaten">frische Tomaten</label>
+    <label><input type="checkbox" name="toppings" value="Zwiebeln">Zwiebeln</label>
+    <label><input type="checkbox" name="toppings" value="Mais">Mais</label>
+    <label><input type="checkbox" name="toppings" value="Ananas">Ananas</label>
+  </div>
+
+  <p><strong>Name:</strong></p>
+  <input name="name" placeholder="Name" required>
+
+  <button type="submit">✅ Bestellung abschicken</button>
+  <p id="msg" class="success">Bestellung wurde aufgenommen!</p>
+</form>
+
+<script>
+const endpoint = "https://script.google.com/macros/s/AKfycbxy8l2Wlcrz1baAZPHcb6DpZVYbmCjaLiLpaD3IbBb-5O3Aww9jKDF67kE53v191nL-0w/exec";
+
+document.getElementById('orderForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const f = e.target;
+  const data = {
+    name: f.name.value.trim(),
+    toppings: [...f.querySelectorAll('input[name="toppings"]:checked')].map(el=>el.value)
+  };
+  if (!data.name || data.toppings.length === 0) {
+    alert("Bitte Name und mindestens einen Belag auswählen!");
+    return;
+  }
+  try {
+    const res = await fetch(endpoint, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    });
+    const j = await res.json();
+    if(j.status==="ok") {
+      f.reset();
+      const msg = document.getElementById('msg');
+      msg.style.display='block';
+      setTimeout(()=>msg.style.display='none', 2500);
+    } else {
+      alert("Fehler: "+j.message);
+    }
+  } catch(err) {
+    alert("Verbindungsfehler: "+err.message);
+  }
+});
+</script>
+</body>
+</html>
