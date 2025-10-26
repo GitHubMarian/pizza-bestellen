@@ -119,33 +119,34 @@
 <script>
 const endpoint = "https://script.google.com/macros/s/AKfycbxy8l2Wlcrz1baAZPHcb6DpZVYbmCjaLiLpaD3IbBb-5O3Aww9jKDF67kE53v191nL-0w/exec";
 
-document.getElementById('orderForm').addEventListener('submit', async e=>{
+document.getElementById('orderForm').addEventListener('submit', async e => {
   e.preventDefault();
   const f = e.target;
   const data = {
     name: f.name.value.trim(),
-    toppings: [...f.querySelectorAll('input[name="toppings"]:checked')].map(el=>el.value)
+    toppings: [...f.querySelectorAll('input[name="toppings"]:checked')].map(el => el.value)
   };
+
   if (!data.name || data.toppings.length === 0) {
     alert("Bitte Name und mindestens einen Belag auswählen!");
     return;
   }
+
   try {
-    const res = await fetch(endpoint, {
-      method:'POST', headers:{'Content-Type':'application/json'},
+    await fetch(endpoint, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    const j = await res.json();
-    if(j.status==="ok") {
-      f.reset();
-      const msg = document.getElementById('msg');
-      msg.style.display='block';
-      setTimeout(()=>msg.style.display='none', 2500);
-    } else {
-      alert("Fehler: "+j.message);
-    }
-  } catch(err) {
-    alert("Verbindungsfehler: "+err.message);
+
+    f.reset();
+    const msg = document.getElementById('msg');
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 2500);
+
+  } catch (err) {
+    alert("Verbindungsfehler: " + err.message);
   }
 });
 </script>
