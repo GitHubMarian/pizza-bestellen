@@ -71,9 +71,14 @@
     background: var(--accent);
     color: white;
     cursor: pointer;
+    transition: background .2s;
   }
   button:active {
     background: #005fcc;
+  }
+  button[disabled] {
+    background: #7daafc;
+    cursor: not-allowed;
   }
   .success {
     display: none;
@@ -122,6 +127,12 @@ const endpoint = "https://script.google.com/macros/s/AKfycbw13usp-bcOVmkV8nR113j
 document.getElementById('orderForm').addEventListener('submit', async e => {
   e.preventDefault();
   const f = e.target;
+  const btn = f.querySelector('button');
+
+  // 🔒 Button sofort sperren
+  btn.disabled = true;
+  btn.textContent = "⏳ wird gesendet...";
+
   const data = {
     name: f.name.value.trim(),
     toppings: [...f.querySelectorAll('input[name="toppings"]:checked')].map(el => el.value)
@@ -129,6 +140,8 @@ document.getElementById('orderForm').addEventListener('submit', async e => {
 
   if (!data.name || data.toppings.length === 0) {
     alert("Bitte Name und mindestens einen Belag auswählen!");
+    btn.disabled = false;
+    btn.textContent = "✅ Bestellung abschicken";
     return;
   }
 
@@ -147,6 +160,12 @@ document.getElementById('orderForm').addEventListener('submit', async e => {
 
   } catch (err) {
     alert("Verbindungsfehler: " + err.message);
+  } finally {
+    // 🕒 Button nach kurzer Pause wieder freigeben
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = "✅ Bestellung abschicken";
+    }, 2000);
   }
 });
 </script>
