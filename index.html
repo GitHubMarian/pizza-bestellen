@@ -52,13 +52,17 @@
     height: 1.2em;
     accent-color: var(--accent);
   }
-  input[name="name"] {
+  input[name="name"], textarea[name="note"] {
     width: 100%;
     padding: .6rem;
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: .5rem;
     box-sizing: border-box;
+  }
+  textarea[name="note"] {
+    resize: vertical;
+    min-height: 60px;
   }
   button {
     margin-top: 1rem;
@@ -117,24 +121,28 @@
   <p><strong>Name:</strong></p>
   <input name="name" placeholder="Name" required>
 
+  <p><strong>Bemerkung (optional):</strong></p>
+  <textarea name="note"></textarea>
+
   <button type="submit">✅ Bestellung abschicken</button>
   <p id="msg" class="success">Bestellung wurde aufgenommen!</p>
 </form>
 
 <script>
-const endpoint = "https://script.google.com/macros/s/AKfycbxhfbFayB1T7v0B9-k530WKOkC1OycgUx8HbPHbTMsmEEwipHrWxBfaoFFpPnT0kSu8Hw/exec";
+const endpoint = "https://script.google.com/macros/s/AKfycbyzgOYPW6rf-ddfd_qpM0uPpuyexVkDtmknnjJnNMTvdYRwtTMX9fne0ofTt9kSDeITAQ/exec";
 
 document.getElementById('orderForm').addEventListener('submit', async e => {
   e.preventDefault();
   const f = e.target;
   const btn = f.querySelector('button');
 
-  // 🔒 Button sofort sperren
+  // Button sofort sperren
   btn.disabled = true;
   btn.textContent = "⏳ wird gesendet...";
 
   const data = {
     name: f.name.value.trim(),
+    note: f.note.value.trim(),
     toppings: [...f.querySelectorAll('input[name="toppings"]:checked')].map(el => el.value)
   };
 
@@ -161,7 +169,7 @@ document.getElementById('orderForm').addEventListener('submit', async e => {
   } catch (err) {
     alert("Verbindungsfehler: " + err.message);
   } finally {
-    // 🕒 Button nach kurzer Pause wieder freigeben
+    // Button nach kurzer Pause wieder freigeben
     setTimeout(() => {
       btn.disabled = false;
       btn.textContent = "✅ Bestellung abschicken";
